@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { PacmanLoader } from 'react-spinners';
 import './App.css';
-import Process from './Process';
+import Download from './Download';
+import Process, { Params } from './Process';
+import runQuery from './runQuery';
 import Upload from './Upload';
 import Verify from './Verify';
 
@@ -9,7 +11,6 @@ enum ProcessState {
   UploadFile,
   Verify,
   Process,
-  RunQueries,
   Complete
 }
 
@@ -26,6 +27,19 @@ function App() {
   const goBackFromVerify = () => {
     setData(null);
     setProcessState(ProcessState.UploadFile);
+  }
+
+  const handleProcess = (p: Params[]) => {
+    setLoading(true);
+
+    let mutableData = data!.slice();
+    p.forEach(param => {
+      mutableData = runQuery(mutableData, param);
+    });
+
+    setData(mutableData);
+    setProcessState(ProcessState.Complete);
+    setLoading(false);
   }
 
   let app;
@@ -50,8 +64,14 @@ function App() {
       app = (
         <Process 
           headers={Object.keys(data![0])}
-          goForward={() => setProcessState(ProcessState.RunQueries)} 
+          goForward={handleProcess} 
         />
+      );
+      break;
+
+    case ProcessState.Complete:
+      app = (
+        <Download data={data!} />
       );
       break;
 

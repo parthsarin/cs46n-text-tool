@@ -24,8 +24,14 @@ const Verify = ({ data, goBack, goForward }: VerifyProps) => {
                     <tbody>
                         {data.slice(0, 10).map((row: string[], i) => {
                             const rowDOM = Object.values(row).map(
-                                (x, j) => <td key={j}>{x.slice(0, 50)}</td>
-                            );
+                            (x, j) => {
+                                if (x.length < 50) {
+                                    return (<td key={j}>{x}</td>);
+                                } else {
+                                    return (<td key={j}>{x.slice(0, 50)}...</td>);
+                                }
+                            });
+
                             return (
                                 <tr key={i}>{rowDOM}</tr>
                             )
