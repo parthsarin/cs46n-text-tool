@@ -1,46 +1,16 @@
-# Getting Started with Create React App
+# CS 46N Text Tool
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Adding a new analysis type
 
-## Available Scripts
+1. Add the name of the analysis type to the `OperationsType` enum in `runQuery.ts`.
+2. In the same file, create a new interface that extends from `Params` and contains the parameters that your analysis will need. At the very least, it will need an `output` parameter, whose value is a string.
+3. Modify `runQuery` to handle the new analysis type. You can assume that `data` will be a list of objects with the same structure as the interface you just created. They will also have an additional `type` variable which is an instance of `OperationsType` and can be used to determine which type of analysis to run. `runQuery` should return a list of objects, which will replace the old list. (i.e. it should probably have the same data, with an additional variable)
+4. Build the view for the new analysis type. Modify the `Operation` component in `Process.tsx` to render the new view.
+   1. In the `constructor`, add a new condition to check for the analysis type you're adding and set the `state` to a reasonable default (`state` should have the same structure as the interface you made in part 2).
+   2. Add functions to update and render the component. You can peruse the existing `update` and `render` functions to see how to do this. Basically, when the user clicks `Run Analysis`, the state will be sent to the `runQuery` function along with the data.
+   3. Modify the `render()` method to call the correct function based on `this.props.type`.
 
-In the project directory, you can run:
 
-### `npm start`
+## Styling
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+The project uses lots of bootstrap styles, and some custom styles in `App.css`.
