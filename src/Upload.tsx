@@ -42,7 +42,6 @@ const Upload = ({ setData, setLoading }: UploadProps) => {
         }
 
         const file = e.dataTransfer.files[0];
-        console.log(file, Papa.parse);
         Papa.parse(file, {
             header: true,
             skipEmptyLines: true,

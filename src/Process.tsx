@@ -1,23 +1,9 @@
 import React, { useState } from 'react';
+import { CountAnalysisParams, LSTMClassifierParams, OperationType, Params } from './runQuery';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Card, Dropdown, Form, FormControl, Button } from 'react-bootstrap';
 import _ from 'lodash';
-
-enum OperationType {
-    Count = "Count"
-}
-
-interface Params {
-    [key: string]: any;
-    output: string;
-}
-
-interface CountAnalysisParams extends Params {
-    terms: string[],
-    variable: string,
-    output: string
-}
 
 interface OperationProps {
     type: OperationType,
@@ -34,12 +20,26 @@ class Operation extends React.Component<OperationProps, OperationState> {
         super(props);
 
         if (props.type === OperationType.Count) {
+            const defaultAP: CountAnalysisParams = {
+                terms: [],
+                variable: "",
+                output: ""
+            };
+
             this.state = {
-                analysisParams: {
-                    terms: [],
-                    variable: "",
-                    output: ""
-                }
+                analysisParams: defaultAP
+            }
+        } else if (props.type === OperationType.LSTMClassifier) {
+            const defaultAP: LSTMClassifierParams = {
+                inputVariable: "",
+                labelVariable: "",
+                trainOnVariable: "",
+                predictOnVariable: "",
+                output: "",
+            }
+
+            this.state = {
+                analysisParams: defaultAP
             }
         } else {
             this.state = {
@@ -48,18 +48,19 @@ class Operation extends React.Component<OperationProps, OperationState> {
         }
     }
 
-    updateCountComponent(terms: string | null = null, variable: string | null = null, output: string | null = null) {
+    updateCountComponent(
+            terms: string | null = null, 
+            variable: string | null = null, 
+            output: string | null = null
+        ) {
         let termsList = terms !== null ? terms.split(',') : this.state.analysisParams!.terms;
         const newVariable = variable !== null ? variable.trim() : this.state.analysisParams!.variable;
         const newOutput = output !== null ? output.trim() : this.state.analysisParams!.output;
 
         termsList = termsList.map((term: string) => term.trim());
-        if (termsList.length === 1 && termsList[0] === "") {
-            termsList = [];
-        }
+        termsList = termsList.filter((term: string) => term !== "");
 
         this.setState({
-            ...this.state,
             analysisParams: {
                 terms: termsList,
                 variable: newVariable,
@@ -69,9 +70,119 @@ class Operation extends React.Component<OperationProps, OperationState> {
     }
 
     renderCountComponent() {
+        const terms = (
+            <FormControl 
+                className="d-inline w-25" 
+                type="text" 
+                placeholder='enter comma-separated terms' 
+                onChange={e => this.updateCountComponent(e.target.value, null, null)} 
+            />
+        );
+        const variable = (
+            <Form.Select 
+                className="d-inline w-25" 
+                onChange={e => this.updateCountComponent(null, e.target.value, null)}
+            >
+                    <option key={-1}>(select)</option>
+                {
+                    this.props.headers.map(
+                        (header, i) => <option key={i}>{header}</option>
+                    )
+                }
+            </Form.Select>
+        )
+        const output = (
+            <Form.Control 
+                className="d-inline w-25" 
+                type="text" 
+                onChange={e => this.updateCountComponent(null, null, e.target.value)} 
+            />
+        )
+
         return (
             <div className="operation">
-                Count occurrences of <FormControl className="d-inline w-25" type="text" placeholder='enter comma-separated terms' onChange={e => this.updateCountComponent(e.target.value)} /> in <Form.Select className="d-inline w-25" onChange={e => this.updateCountComponent(null, e.target.value)}>{this.props.headers.map((header, i) => <option key={i}>{header}</option>)}</Form.Select> and store it in the variable <Form.Control className="d-inline w-25" type="text" onChange={e => this.updateCountComponent(null, null, e.target.value)} />.
+                Count occurrences of {terms} in {variable} and store it in the variable {output}.
+            </div>
+        )
+    }
+
+    updateLSTMComponent(key: string, val: string) {
+        this.setState({
+            analysisParams: {
+                ...this.state.analysisParams as LSTMClassifierParams,
+                [key]: val
+            }
+        });
+    }
+
+    renderLSTMComponent() {
+        const inputVariable = (
+            <Form.Select
+                className="d-inline w-25"
+                onChange={e => this.updateLSTMComponent("inputVariable", e.target.value)}
+            >
+                <option key={-1}>(select)</option>
+                {
+                    this.props.headers.map(
+                        (header, i) => <option key={i}>{header}</option>
+                    )
+                }
+            </Form.Select>
+        );
+
+        const labelVariable = (
+            <Form.Select
+                className="d-inline w-25"
+                onChange={e => this.updateLSTMComponent("labelVariable", e.target.value)}
+            >
+                <option key={-1}>(select)</option>
+                {
+                    this.props.headers.map(
+                        (header, i) => <option key={i}>{header}</option>
+                    )
+                }
+            </Form.Select>
+        );
+
+        const trainOnVariable = (
+            <Form.Select
+                className="d-inline w-25"
+                onChange={e => this.updateLSTMComponent("trainOnVariable", e.target.value)}
+            >
+                <option key={-1}>(select)</option>
+                {
+                    this.props.headers.map(
+                        (header, i) => <option key={i}>{header}</option>
+                    )
+                }
+            </Form.Select>
+        );
+
+        const predictOnVariable = (
+            <Form.Select
+                className="d-inline w-25"
+                onChange={e => this.updateLSTMComponent("predictOnVariable", e.target.value)}
+            >
+                <option key={-1}>(select)</option>
+                {
+                    this.props.headers.map(
+                        (header, i) => <option key={i}>{header}</option>
+                    )
+                }
+            </Form.Select>
+        );
+
+        const output = (
+            <Form.Control
+                className="d-inline w-25"
+                type="text"
+                onChange={e => this.updateLSTMComponent("output", e.target.value)}
+            />
+        )
+
+        return (
+            <div className="operation">
+                Train an LSTM classifier on {inputVariable} and predict {labelVariable}. Train using the inputs that are marked with a "1" in {trainOnVariable} and predict for inputs marked with a "1" in {predictOnVariable}. Store the predictions in {output}.
             </div>
         )
     }
@@ -80,6 +191,11 @@ class Operation extends React.Component<OperationProps, OperationState> {
         if (this.props.type === OperationType.Count) {
             return this.renderCountComponent();
         }
+
+        if (this.props.type === OperationType.LSTMClassifier) {
+            return this.renderLSTMComponent();
+        }
+
         return null;
     }
 }
@@ -133,7 +249,7 @@ const Process = ({ headers, goForward }: ProcessProps) => {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            {Object.keys(OperationType).map((type, i) => (
+                            {Object.values(OperationType).map((type, i) => (
                                 <Dropdown.Item 
                                     key={i} 
                                     onClick={() => addOperation(type as OperationType)}

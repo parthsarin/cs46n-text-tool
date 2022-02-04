@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { PacmanLoader } from 'react-spinners';
 import './App.css';
 import Download from './Download';
-import Process, { Params } from './Process';
-import runQuery from './runQuery';
+import Process from './Process';
+import runQuery, { Params } from './runQuery';
 import Upload from './Upload';
 import Verify from './Verify';
 
