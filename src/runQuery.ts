@@ -48,8 +48,8 @@ const runLSTMClassifier = (data: any[], query: LSTMClassifierParams): any[] => {
     const trainData = trainFilter.map(row => ({
         'input': row[query.inputVariable], 'output': row[query.labelVariable]
     }));
-    console.log(trainData);
-    net.train(trainData);
+    console.log('Training...')
+    net.train(trainData, {errorThresh: 0.1, iterations: 100});
 
     // Predict
     return data.map(row => ({
